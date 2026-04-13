@@ -1,0 +1,12 @@
+# Variables de entorno — NUNCA subir a Git
+.env
+
+# macOS
+.DS_Store
+
+# Logs locales
+*.log
+logs/
+
+# Backups locales
+backups/

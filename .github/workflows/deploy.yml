@@ -1,0 +1,81 @@
+name: SonarQube CE — Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Job 1: Validar sintaxis del docker-compose.yml
+  # Corre en runner alojado por GitHub (no requiere self-hosted)
+  # ──────────────────────────────────────────────
+  validate:
+    name: Validate Compose
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Crear .env temporal para validación
+        run: echo "POSTGRES_PASSWORD=dummy_validation_password" > .env
+
+      - name: Validar sintaxis docker-compose.yml
+        run: docker compose config --quiet
+
+      - name: Limpiar .env temporal
+        if: always()
+        run: rm -f .env
+
+  # ──────────────────────────────────────────────
+  # Job 2: Desplegar en Docker Desktop local
+  # Requiere runner self-hosted con label 'sonarqube'
+  # Solo se ejecuta en push a main (no en PRs)
+  # ──────────────────────────────────────────────
+  deploy:
+    name: Deploy SonarQube CE
+    runs-on: [self-hosted, sonarqube]
+    needs: validate
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Crear archivo .env desde secret
+        run: |
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" > .env
+
+      - name: Actualizar imágenes Docker
+        run: docker compose pull
+
+      - name: Levantar servicios
+        run: docker compose up -d --remove-orphans
+
+      - name: Esperar que SonarQube esté disponible
+        run: |
+          echo "Esperando que SonarQube inicie (máx. 120s)..."
+          for i in $(seq 1 24); do
+            STATUS=$(curl -s http://localhost:9000/api/system/status | grep -o '"status":"[^"]*"' | head -1 || true)
+            if echo "$STATUS" | grep -q '"status":"UP"'; then
+              echo "SonarQube está UP."
+              exit 0
+            fi
+            echo "Intento $i/24 — esperando 5s..."
+            sleep 5
+          done
+          echo "ERROR: SonarQube no respondió en 120 segundos."
+          docker compose logs sonarqube --tail=50
+          exit 1
+
+      - name: Limpiar .env
+        if: always()
+        run: rm -f .env
+
+      - name: Mostrar estado de contenedores
+        if: always()
+        run: docker compose ps
