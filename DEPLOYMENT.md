@@ -7,10 +7,10 @@
 | **Repositorio GitHub** | https://github.com/adelriob/sonarqube-docker |
 | **URL de acceso** | http://localhost:9000 |
 | **Credenciales iniciales** | `admin` / `admin` (se fuerza cambio en primer login) |
-| **Imagen SonarQube** | `sonarqube:community` (Community Edition — última estable) |
+| **Imagen SonarQube** | `sonarqube:community` (Community Edition — v26.4.0.121862) |
 | **Base de datos** | PostgreSQL 16 (Alpine) |
 | **Puerto expuesto** | `9000` |
-| **Runner GitHub Actions** | Self-hosted con label `sonarqube` |
+| **Runner GitHub Actions** | Self-hosted `mac-sonarqube-runner` (macOS ARM64, label `sonarqube`) |
 
 ---
 
