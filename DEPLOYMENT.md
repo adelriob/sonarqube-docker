@@ -6,7 +6,7 @@
 |-------|-------|
 | **Repositorio GitHub** | https://github.com/adelriob/sonarqube-docker |
 | **URL de acceso** | http://localhost:9000 |
-| **Credenciales iniciales** | `admin` / `admin` (se fuerza cambio en primer login) |
+| **Credenciales iniciales** | `admin` / `admin` — **ya cambiadas el 2026-04-13** |
 | **Imagen SonarQube** | `sonarqube:community` (Community Edition — v26.4.0.121862) |
 | **Base de datos** | PostgreSQL 16 (Alpine) |
 | **Puerto expuesto** | `9000` |
@@ -59,9 +59,8 @@ O simplemente abre: **http://localhost:9000**
 
 ### 4. Cambiar contraseña de administrador
 
-1. Abre http://localhost:9000
-2. Login: `admin` / `admin`
-3. SonarQube forzará el cambio de contraseña inmediatamente
+> **Completado el 2026-04-13.** La contraseña por defecto `admin/admin` ya fue cambiada.
+> Guarda la nueva contraseña en tu gestor de contraseñas.
 
 ---
 
